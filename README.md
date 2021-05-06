@@ -34,6 +34,45 @@ npm install
 npm run dev
 ```
 
+### Set up a Cloud Firestore
+
+This project uses Firebase for the dynamic configuration of homepage templates.
+Please refer to the [Firebase
+documentation](https://firebase.google.com/docs/firestore) to set up your
+firestore.
+
+Note you'll need to set the following environment variables:
+
+- `FIREBASE_API_KEY`
+- `FIREBASE_AUTH_DOMAIN`
+- `FIREBASE_PROJECT_ID`
+
+If you do not want to implement Firebase, remove the invocation of
+`useFirebaseFeaturedTemplates` and fetch templates directly from Atomic Assets
+(for example, with the
+`http://proton.api.atomicassets.io/atomicassets/docs/swagger/#/templates/get_v1_templates`
+endpoint).
+
+The API response will contain an array of templates which you can pass as the
+`items` prop of the `Grid` component rendered.
+
+```js
+// pages/index.tsx
+
+const MarketPlace = (): JSX.Element => {
+  const featuredTemplates = useFirebaseFeaturedTemplates();
+  return (
+    <PageLayout>
+      <Banner modalType={MODAL_TYPES.CLAIM} />
+      <ExploreCard />
+      <HomepageStatistics />
+      <Title>New &amp; Noteworthy</Title>
+      <Grid items={featuredTemplates} />
+    </PageLayout>
+  );
+};
+```
+
 ## Environment
 
 Create a copy of `.env.template` and name it `.env.local`:
@@ -43,6 +82,9 @@ For mainnet:
 NEXT_PUBLIC_CHAIN_ENDPOINTS='https://proton.eoscafeblock.com, https://proton.greymass.com'
 NEXT_PUBLIC_BLOCK_EXPLORER='https://proton.bloks.io/block/'
 NEXT_PUBLIC_NFT_ENDPOINT='https://proton.api.atomicassets.io'
+FIREBASE_API_KEY=string
+FIREBASE_AUTH_DOMAIN=string
+FIREBASE_PROJECT_ID=string
 ```
 
 For testnet:
@@ -50,6 +92,9 @@ For testnet:
 NEXT_PUBLIC_CHAIN_ENDPOINTS='https://testnet.protonchain.com'
 NEXT_PUBLIC_BLOCK_EXPLORER='https://proton-test.bloks.io/block/'
 NEXT_PUBLIC_NFT_ENDPOINT='https://test.proton.api.atomicassets.io'
+FIREBASE_API_KEY=string
+FIREBASE_AUTH_DOMAIN=string
+FIREBASE_PROJECT_ID=string
 ```
 
 ## Marketplace
