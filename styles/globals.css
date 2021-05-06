@@ -1,0 +1,36 @@
+@font-face {
+  font-family: 'CircularStd';
+  src: url('/fonts/CircularStd-Book.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'CircularStdBold';
+  src: url('/fonts/CircularStd-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'CircularStdMedium';
+  src: url('/fonts/CircularStd-Medium.woff') format('woff');
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'CircularStd';
+}
+
+*:focus-visible {
+  outline-color: #752eeb;
+}
