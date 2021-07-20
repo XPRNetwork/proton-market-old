@@ -1,5 +1,6 @@
 export { useAuthContext, AuthProvider } from './AuthProvider';
 export {
+  CREATE_PAGE_STATES,
   useCreateAssetContext,
   CreateAssetProvider,
 } from './CreateAssetProvider';

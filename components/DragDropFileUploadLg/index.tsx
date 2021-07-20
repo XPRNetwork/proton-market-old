@@ -1,11 +1,5 @@
 /* eslint-disable jsx-a11y/media-has-caption */
-import {
-  useCallback,
-  useState,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-} from 'react';
+import { useCallback, useState, Dispatch, SetStateAction } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from '../../styles/index.styled';
 import {
@@ -53,6 +47,8 @@ const DragDropFileUploadLg = ({
       setTemplateUploadedFile(file);
       fileReader((result) => setUploadedFilePreview(result), file);
     } else {
+      setTemplateUploadedFile(null);
+      setUploadedFilePreview('');
       setUploadError(
         'Unable to upload, please double check your file size or file type.'
       );

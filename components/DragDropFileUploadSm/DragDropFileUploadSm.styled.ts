@@ -24,6 +24,7 @@ export const PreviewImage = styled.img`
   width: 88px;
   height: 88px;
   border-radius: 100%;
+  object-fit: cover;
 `;
 
 export const PlaceholderContainer = styled(PreviewImage).attrs({

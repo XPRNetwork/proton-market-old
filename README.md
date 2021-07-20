@@ -77,14 +77,25 @@ const MarketPlace = (): JSX.Element => {
 
 Create a copy of `.env.template` and name it `.env.local`:
 
+* `NEXT_PUBLIC_CHAIN_ENDPOINTS` is used for initializing the Proton Web SDK.
+* `NEXT_PUBLIC_BLOCK_EXPLORER` is used for connecting to the Proton Block Explorer.
+* `NEXT_PUBLIC_NFT_ENDPOINT` is used for connecting to the Atomic Assets API.
+* `NEXT_PUBLIC_GA_TRACKING_ID` is used for initializing Google Analytics.
+* `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, and `FIREBASE_PROJECT_ID` are used
+  for initializing Firebase for the homepage's featured NFTs.
+* `PINATA_API_KEY` and `PINATA_SECRET` are used for connecting to [Pinata](https://pinata.cloud/) for IPFS upload.
+
 For mainnet:
 ```
 NEXT_PUBLIC_CHAIN_ENDPOINTS='https://proton.eoscafeblock.com, https://proton.greymass.com'
 NEXT_PUBLIC_BLOCK_EXPLORER='https://proton.bloks.io/block/'
 NEXT_PUBLIC_NFT_ENDPOINT='https://proton.api.atomicassets.io'
+NEXT_PUBLIC_GA_TRACKING_ID='string'
 FIREBASE_API_KEY=string
 FIREBASE_AUTH_DOMAIN=string
 FIREBASE_PROJECT_ID=string
+PINATA_API_KEY=string
+PINATA_SECRET=string
 ```
 
 For testnet:
@@ -92,9 +103,12 @@ For testnet:
 NEXT_PUBLIC_CHAIN_ENDPOINTS='https://testnet.protonchain.com'
 NEXT_PUBLIC_BLOCK_EXPLORER='https://proton-test.bloks.io/block/'
 NEXT_PUBLIC_NFT_ENDPOINT='https://test.proton.api.atomicassets.io'
+NEXT_PUBLIC_GA_TRACKING_ID='string'
 FIREBASE_API_KEY=string
 FIREBASE_AUTH_DOMAIN=string
 FIREBASE_PROJECT_ID=string
+PINATA_API_KEY=string
+PINATA_SECRET=string
 ```
 
 ## Marketplace

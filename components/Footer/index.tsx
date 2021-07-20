@@ -8,6 +8,10 @@ import {
 
 const links = [
   {
+    name: 'Open Source',
+    url: 'https://github.com/ProtonProtocol/proton-market-template',
+  },
+  {
     name: 'Give Us Feedback',
     url: 'https://t.me/protonnft',
   },

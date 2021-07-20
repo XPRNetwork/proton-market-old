@@ -41,9 +41,7 @@ export const TransferModal = (): JSX.Element => {
         return;
       }
 
-      const user = await proton.getUserByChainAccount({
-        account: recipient,
-      });
+      const user = await proton.getUserByChainAccount(recipient);
 
       if (!user) {
         setError('Invalid user. Please try again.');

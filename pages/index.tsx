@@ -9,6 +9,7 @@ import Grid from '../components/Grid';
 
 const MarketPlace = (): JSX.Element => {
   const featuredTemplates = useFirebaseFeaturedTemplates();
+
   return (
     <PageLayout>
       <Banner modalType={MODAL_TYPES.CLAIM} />

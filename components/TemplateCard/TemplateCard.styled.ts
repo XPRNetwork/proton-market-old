@@ -1,19 +1,28 @@
-import styled from 'styled-components';
-import { IconContainer } from '../CollectionIcon/CollectionIcon.styled';
+import styled, { keyframes } from 'styled-components';
+
+const placeHolderShimmer = keyframes`
+  0% {
+    background-position: -500px 0
+  }
+  100% {
+    background-position: 500px 0
+  }
+`;
+
+const loadingAsset = keyframes`
+  0% {
+    background-color: #ffffff;
+  }
+  50% {
+    background-color: #eaeaea;
+  }
+  100% {
+    background-color: #ffffff;
+  }
+`;
 
 type CardProps = {
   hasMultiple: boolean;
-  noHoverEffect: boolean;
-  isStatic?: boolean;
-  imageHoverEffect?: boolean;
-};
-
-type GreyTextProps = {
-  price?: string;
-};
-
-type CollectionNameButtonProps = {
-  isStatic?: boolean;
 };
 
 export const Card = styled.article<CardProps>`
@@ -27,23 +36,14 @@ export const Card = styled.article<CardProps>`
   padding: 0 24px 24px;
   position: relative;
   transition: 0.3s;
+  cursor: pointer;
 
-  :hover .template-image-container img,
-  :focus-visible .template-image-container img {
-    transition: 0.1s;
-    transform: ${({ imageHoverEffect }) =>
-      imageHoverEffect ? 'scale(1.03)' : 'none'};
-  }
-
-  ${({ isStatic }) => (isStatic ? '' : 'cursor: pointer')};
   :hover {
-    transform: ${({ noHoverEffect }) =>
-      noHoverEffect ? 'none' : 'scale(1.02)'};
+    transform: scale(1.02);
   }
 
   :focus-visible {
-    transform: ${({ noHoverEffect }) =>
-      noHoverEffect ? 'none' : 'scale(1.02)'};
+    transform: scale(1.02);
   }
 
   ${({ hasMultiple }) =>
@@ -98,17 +98,17 @@ export const Text = styled.span`
   text-overflow: ellipsis;
 `;
 
-export const CollectionNameButton = styled.button<CollectionNameButtonProps>`
+export const CollectionNameButton = styled.button`
   display: flex;
   align-items: center;
   background-color: transparent;
   outline: none;
   border: none;
   z-index: 1;
-  ${({ isStatic }) => (isStatic ? '' : 'cursor: pointer')};
+  cursor: pointer;
 `;
 
-export const GreyText = styled(Text)<GreyTextProps>`
+export const GreyText = styled(Text)`
   color: #808080;
   margin-bottom: 8px;
 `;
@@ -133,8 +133,19 @@ export const PlaceholderPrice = styled.div`
   height: 8px;
 `;
 
-export const PlaceholderIcon = styled(IconContainer).attrs({ as: 'div' })`
-  background-color: #e6e6e6;
-  width: ${({ width }) => width || '32px'};
-  height: ${({ width }) => width || '32px'};
+export const ShimmerBlock = styled(PlaceholderPrice)`
+  animation: ${placeHolderShimmer} 1s linear infinite;
+  background: linear-gradient(to right, #eeeeee 8%, #e7e7e7 18%, #eeeeee 33%);
+  background-size: 1000px 18px;
+  width: 200px;
+  height: 14px;
+`;
+
+export const PlaceholderAsset = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  animation: ${loadingAsset} 1s infinite;
 `;

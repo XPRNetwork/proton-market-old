@@ -58,6 +58,7 @@ export const MenuItem = styled.li`
   color: #0e103c;
   font-size: 16px;
   outline-color: #752eeb;
+  position: relative;
 
   :hover,
   :focus-visible {

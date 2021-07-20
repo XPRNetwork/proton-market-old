@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Image } from '../../styles/index.styled';
 import TableDataCell from '../TableDataCell';
-import { AvatarImage, ImageDataCell } from './SalesHistoryTableCell.styled';
+import AvatarIcon from '../AvatarIcon';
+import { ImageDataCell } from './SalesHistoryTableCell.styled';
 
 export type BuyerContent = {
   avatar: string;
@@ -30,17 +31,7 @@ const SalesHistoryTableCell = ({ id, content }: Props): JSX.Element => {
             onMouseEnter={addHoverState}
             onMouseLeave={removeHoverState}
             onClick={navigateToBuyer}>
-            <AvatarImage>
-              <Image
-                width="32px"
-                height="32px"
-                src={
-                  avatar
-                    ? `data:image/jpeg;base64,${avatar}`
-                    : '/default-avatar.png'
-                }
-              />
-            </AvatarImage>
+            <AvatarIcon avatar={avatar} size="32px" margin={'0 0 0 10px'} />
           </ImageDataCell>
           <TableDataCell
             color={isOnHover ? '#752eeb' : '#1a1a1a'}

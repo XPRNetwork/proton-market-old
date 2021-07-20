@@ -2,6 +2,10 @@ import styled from 'styled-components';
 import { breakpoint } from '../../styles/Breakpoints';
 import { StyledButton } from '../Button/Button.styled';
 
+type EmptyContentProps = {
+  hasTopBorder?: boolean;
+};
+
 export const Button = styled(StyledButton)`
   padding: 11px 16px 13px;
 
@@ -13,15 +17,22 @@ export const Button = styled(StyledButton)`
   `}
 `;
 
-export const EmptyContent = styled.div`
+export const EmptyContent = styled.div<EmptyContentProps>`
   display: flex;
   flex-direction: column;
   margin: 0 auto;
-  margin-top: 140px;
+  padding-top: 140px;
   align-items: center;
+  width: 100%;
 
   ${breakpoint.mobile`
     margin-bottom: 140px;
+  `}
+
+  ${({ hasTopBorder }) =>
+    hasTopBorder &&
+    `
+    border-top: 1px solid rgb(230, 230, 230);
   `}
 `;
 

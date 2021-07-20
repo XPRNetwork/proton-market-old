@@ -29,6 +29,11 @@ const ReadMoreDescription = ({
     let maxCharacters = maxDescriptionLength;
     for (let index = 0; index < words.length; index++) {
       const word = words[index];
+
+      if (word.length > maxDescriptionLength) {
+        return word.slice(0, maxDescriptionLength);
+      }
+
       maxCharacters -= word.length + 1;
 
       if (maxCharacters < 0) {

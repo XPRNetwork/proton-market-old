@@ -114,6 +114,9 @@ export const ModalButton = styled(StyledButton)`
 `;
 
 export const HalfButton = styled(StyledButton)<HalfButtonProps>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width: 144px;
   align-self: flex-end;
   padding: ${({ padding }) => padding || '11px 16px 13px'};
@@ -161,5 +164,39 @@ export const DragDropButton = styled(StyledButton)`
   :focus {
     background: #752eeb;
     color: #f2f2f2;
+  }
+`;
+
+export const Link = styled.a`
+  font-size: 14px;
+  line-height: 24px;
+  color: #752eeb;
+
+  :hover {
+    color: rgba(117, 46, 235, 0.6);
+    cursor: pointer;
+  }
+`;
+
+export const TextArea = styled.textarea`
+  width: 100%;
+  height: 160px;
+  margin-bottom: 24px;
+  padding: 11px 16px 101px;
+  border-radius: 8px;
+  border: solid 1px #e6e6e6;
+  font-size: 16px;
+  line-height: 1.5;
+
+  ::-webkit-scrollbar {
+    width: 0;
+    color: transparent;
+    background-color: transparent;
+  }
+
+  ::placeholder {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #808080;
   }
 `;

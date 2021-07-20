@@ -53,7 +53,9 @@ type GetCollectionOptions = {
 
 export type Account = {
   assets: number;
-  collections: Collection[];
+  collections: Array<{
+    collection: { collection_name: string };
+  }>;
   templates: {
     assets: string;
     collection_name: string;
@@ -68,9 +70,6 @@ type formatTemplatesWithLowPriceAndAssetCountProps = {
     [templateId: string]: string;
   };
   assetCountByIdWithHidden: {
-    [templateId: string]: string;
-  };
-  lowPriceById: {
     [templateId: string]: string;
   };
 };
@@ -318,7 +317,10 @@ export const formatTemplatesWithPriceData = (
 
 export const getAllTemplatesForUserWithAssetCount = async (
   owner: string
-): Promise<Template[]> => {
+): Promise<{
+  templates: Template[];
+  collectionNames: string[];
+}> => {
   try {
     const accountResponse = await getFromApi<Account>(
       `${process.env.NEXT_PUBLIC_NFT_ENDPOINT}/atomicassets/v1/accounts/${owner}`
@@ -349,51 +351,14 @@ export const getAllTemplatesForUserWithAssetCount = async (
     const templateIds = accountResponse.data.templates.map(
       ({ template_id }) => template_id
     );
-    if (!templateIds.length) return [];
-
-    const templates = await getTemplatesFromTemplateIds(templateIds);
-
-    const templatesAndPricesByCollection = {};
-    for (const template of templates) {
-      const {
-        template_id,
-        collection: { collection_name },
-      } = template;
-      if (templatesAndPricesByCollection[collection_name]) {
-        templatesAndPricesByCollection[collection_name]['templates'][
-          template_id
-        ] = template;
-      } else {
-        templatesAndPricesByCollection[collection_name] = {
-          lowestPricesByTemplateId: {},
-          templates: {
-            [template_id]: template,
-          },
-        };
-      }
-    }
-
-    for (const collection_name of Object.keys(templatesAndPricesByCollection)) {
-      const lowestPrices = await getLowestPricesForAllCollectionTemplates({
-        type: collection_name,
-      });
-
-      templatesAndPricesByCollection[
-        collection_name
-      ].lowestPricesByTemplateId = lowestPrices;
-    }
-
-    const lowestPricesByCollection = Object.values(
-      templatesAndPricesByCollection
-    ).map(({ lowestPricesByTemplateId }) => lowestPricesByTemplateId);
-
-    let allLowestPricesByTemplateId = {};
-    for (const price of lowestPricesByCollection) {
-      allLowestPricesByTemplateId = {
-        ...allLowestPricesByTemplateId,
-        ...price,
+    if (!templateIds.length) {
+      return {
+        templates: [],
+        collectionNames: [],
       };
     }
+
+    const templates = await getTemplatesFromTemplateIds(templateIds);
 
     const templatesWithAssetsForSaleCount = formatTemplatesWithPriceAndAssetCountInCreateDescOrder(
       {
@@ -401,14 +366,49 @@ export const getAllTemplatesForUserWithAssetCount = async (
         templates: templates,
         assetCountById: userAssetsByTemplateId,
         assetCountByIdWithHidden: userAssetsWithHiddenByTemplateId,
-        lowPriceById: allLowestPricesByTemplateId,
       }
     );
 
-    return templatesWithAssetsForSaleCount;
+    const collectionNames = Array.from(
+      new Set([
+        ...accountResponse.data.collections.map(
+          ({ collection }) => collection.collection_name
+        ),
+        ...accountResponseWithHidden.data.collections.map(
+          ({ collection }) => collection.collection_name
+        ),
+      ])
+    );
+
+    return {
+      templates: templatesWithAssetsForSaleCount,
+      collectionNames,
+    };
   } catch (e) {
     throw new Error(e);
   }
+};
+
+export const getLowestPricesByTemplateId = async (
+  collectionNames: string[]
+): Promise<{ [templateId: string]: string }> => {
+  let lowestPricesByTemplateId = {};
+
+  const promises = collectionNames.map(async (collection_name: string) => {
+    const lowestPricesForCollection = await getLowestPricesForAllCollectionTemplates(
+      {
+        type: collection_name,
+      }
+    );
+
+    lowestPricesByTemplateId = {
+      ...lowestPricesByTemplateId,
+      ...lowestPricesForCollection,
+    };
+  });
+  await Promise.all(promises);
+
+  return lowestPricesByTemplateId;
 };
 
 /**
@@ -427,7 +427,6 @@ const formatTemplatesWithPriceAndAssetCountInCreateDescOrder = ({
   templates,
   assetCountById,
   assetCountByIdWithHidden,
-  lowPriceById,
 }: formatTemplatesWithLowPriceAndAssetCountProps) => {
   const templatesWithAssetsForSaleCount = templateIds
     .reduce((acc, templateId) => {
@@ -443,7 +442,7 @@ const formatTemplatesWithPriceAndAssetCountInCreateDescOrder = ({
           parseInt(assetCountByIdWithHidden[templateId] || '0');
 
         template.assetsForSale = `${assetsForSale}`;
-        template.lowestPrice = lowPriceById[templateId];
+        template.lowestPrice = ''; // TODO: REMOVE
 
         acc.push(template);
       }
@@ -466,12 +465,11 @@ export const getTemplatesFromTemplateIds = async (
 ): Promise<Template[]> => {
   // Organize pagination with an object (key: page number, value: array of templateIds)
   const pages: { [page: number]: string[] } = {};
-  for (let i = 1; i <= Math.ceil(templateIds.length / 100); i++) {
-    const startIdx = i - 1 + (i - 1) * 100;
-    const endIdx = i * 100;
-    pages[i] = templateIds.slice(startIdx, endIdx);
+  for (let i = 0; i <= Math.ceil(templateIds.length / 100) - 1; i++) {
+    const startIdx = i * 100;
+    const endIdx = (i + 1) * 100;
+    pages[i + 1] = templateIds.slice(startIdx, endIdx);
   }
-
   let templates = [];
   let page = 1;
   let hasResults = true;
@@ -507,20 +505,24 @@ export const getTemplatesFromTemplateIds = async (
   return templates;
 };
 
-export const getUserCreatedTemplates = async (
-  account: string,
-  page?: number,
-  hasAssets?: boolean
-): Promise<Template[]> => {
+export const getPaginatedCreationsByCreator = async ({
+  chainAccount,
+  showZeroMints,
+  page,
+}: {
+  chainAccount: string;
+  showZeroMints: boolean;
+  page?: number;
+}): Promise<Template[]> => {
   try {
-    const pageParam = page ? page : 1;
+    const pageParam = page || 1;
     const templatesQueryObject = {
-      authorized_account: account,
-      sort: 'updated',
+      authorized_account: chainAccount,
+      sort: 'created',
       order: 'desc',
       page: pageParam,
       limit: PAGINATION_LIMIT,
-      has_assets: Boolean(hasAssets),
+      has_assets: Boolean(showZeroMints),
     };
 
     const templatesQueryParams = toQueryString(templatesQueryObject);
@@ -533,6 +535,52 @@ export const getUserCreatedTemplates = async (
     }
 
     return templatesResponse.data;
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const getAllCreationsByCreator = async ({
+  chainAccount,
+  showZeroMints,
+}: {
+  chainAccount: string;
+  showZeroMints: boolean;
+}): Promise<Template[]> => {
+  try {
+    const limit = 100;
+    let templates = [];
+    let hasResults = true;
+    let page = 1;
+
+    while (hasResults) {
+      const templatesQueryObject = {
+        authorized_account: chainAccount,
+        sort: 'created',
+        order: 'desc',
+        page,
+        limit,
+        has_assets: Boolean(showZeroMints),
+      };
+
+      const templatesQueryParams = toQueryString(templatesQueryObject);
+      const templatesResponse = await getFromApi<Template[]>(
+        `${process.env.NEXT_PUBLIC_NFT_ENDPOINT}/atomicassets/v1/templates?${templatesQueryParams}`
+      );
+
+      if (!templatesResponse.success) {
+        throw new Error((templatesResponse.message as unknown) as string);
+      }
+
+      if (templatesResponse.data.length < limit) {
+        hasResults = false;
+      }
+
+      templates = templates.concat(templatesResponse.data);
+      page += 1;
+    }
+
+    return templates;
   } catch (e) {
     throw new Error(e);
   }
