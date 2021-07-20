@@ -1,7 +1,12 @@
 import { Video } from './AssetDisplay.styled';
 import { IPFS_RESOLVER_VIDEO } from '../../utils/constants';
 
-const AssetVideo = ({ video }: { video: string }): JSX.Element => (
+type Props = {
+  video: string;
+  created: string;
+};
+
+const AssetVideo = ({ video }: Props): JSX.Element => (
   <Video
     controls
     loop

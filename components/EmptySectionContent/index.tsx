@@ -1,27 +1,29 @@
+import { FC } from 'react';
 import { useRouter } from 'next/router';
-import React from 'react';
 import {
   EmptyContent,
   Title,
   Subtitle,
   Button,
-} from './EmptyUserContent.styled';
+} from './EmptySectionContent.styled';
 
 type Props = {
   subtitle: string;
-  buttonTitle: string;
+  buttonTitle?: string;
   link?: string;
+  hasTopBorder?: boolean;
 };
 
-const EmptyUserContent = ({
+const EmptySectionContent: FC<Props> = ({
   subtitle,
-  buttonTitle,
-  link,
-}: Props): JSX.Element => {
+  buttonTitle = 'Explore NFTs',
+  link = '/',
+  hasTopBorder = false,
+}) => {
   const router = useRouter();
 
   return (
-    <EmptyContent>
+    <EmptyContent hasTopBorder={hasTopBorder}>
       <Title>No items found</Title>
       <Subtitle>{subtitle}</Subtitle>
       <Button onClick={() => router.push(link)}>{buttonTitle}</Button>
@@ -29,4 +31,4 @@ const EmptyUserContent = ({
   );
 };
 
-export default EmptyUserContent;
+export default EmptySectionContent;

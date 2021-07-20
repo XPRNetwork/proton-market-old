@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, memo } from 'react';
 import { Image } from '../../styles/index.styled';
+import { useModalContext, MODAL_TYPES } from '../Provider';
 import {
   PageHeaderContainer,
   ImageContainer,
@@ -7,12 +8,14 @@ import {
   Name,
   SubName,
   ButtonContainer,
+  VerifiedIconContainer,
+  PageHeaderAvatarContainer,
 } from './PageHeader.styled';
 import { ReactComponent as MoreIcon } from '../../public/more.svg';
+import { ReactComponent as VerifiedIcon } from '../../public/icon-light-verified-24-px.svg';
 import ShareOnSocial from '../ShareOnSocial';
 import { useClickAway } from '../../hooks';
-import { IPFS_RESOLVER_IMAGE, RESIZER_IMAGE } from '../../utils/constants';
-import { useModalContext, MODAL_TYPES } from '../Provider';
+import { IPFS_RESOLVER_IMAGE, RESIZER_IMAGE_SM } from '../../utils/constants';
 import ReadMoreDescription from '../ReadMoreDescription';
 
 type PageHeaderProps = {
@@ -21,7 +24,9 @@ type PageHeaderProps = {
   name?: string;
   subName?: string;
   type: 'user' | 'collection';
+  author?: string;
   hasEditFunctionality?: boolean;
+  isLightKYCVerified?: boolean;
 };
 
 const PageHeader = ({
@@ -31,6 +36,7 @@ const PageHeader = ({
   subName,
   type,
   hasEditFunctionality,
+  isLightKYCVerified,
 }: PageHeaderProps): JSX.Element => {
   const { openModal } = useModalContext();
   const [shareActive, setShareActive] = useState<boolean>(false);
@@ -41,7 +47,7 @@ const PageHeader = ({
     ? `data:image/jpeg;base64,${image}`
     : '/default-avatar.png';
   const collectionImg = image
-    ? `${RESIZER_IMAGE}${IPFS_RESOLVER_IMAGE}${image}`
+    ? `${RESIZER_IMAGE_SM}${IPFS_RESOLVER_IMAGE}${image}`
     : '/proton.svg';
 
   const displayImg = type === 'user' ? avatarImg : collectionImg;
@@ -74,19 +80,27 @@ const PageHeader = ({
       </RoundButton>
     </ButtonContainer>
   ) : (
-    shareButton
+    <ButtonContainer>{shareButton}</ButtonContainer>
   );
 
   return (
     <PageHeaderContainer>
-      <ImageContainer>
-        <Image
-          width="120px"
-          height="120px"
-          src={displayImg}
-          onError={onImageError}
-        />
-      </ImageContainer>
+      <PageHeaderAvatarContainer>
+        <ImageContainer>
+          <Image
+            width="100%"
+            height="100%"
+            src={displayImg}
+            onError={onImageError}
+            objectFit="cover"
+          />
+        </ImageContainer>
+        {isLightKYCVerified && (
+          <VerifiedIconContainer>
+            <VerifiedIcon />
+          </VerifiedIconContainer>
+        )}
+      </PageHeaderAvatarContainer>
       <Name>{name}</Name>
       {subName ? <SubName>@{subName}</SubName> : null}
       {description ? (
@@ -96,7 +110,7 @@ const PageHeader = ({
           maxWidth="684px"
           textAlign="center"
           fontColor="#808080"
-          maxDescriptionLength={190}
+          maxDescriptionLength={183}
         />
       ) : null}
       {buttons}
@@ -104,4 +118,4 @@ const PageHeader = ({
   );
 };
 
-export default PageHeader;
+export default memo(PageHeader);

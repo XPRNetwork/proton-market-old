@@ -5,6 +5,7 @@ import Grid from '../../components/Grid';
 import PaginationButton from '../../components/PaginationButton';
 import ErrorComponent from '../../components/Error';
 import LoadingPage from '../../components/LoadingPage';
+import EmptySectionContent from '../../components/EmptySectionContent';
 import {
   Template,
   getTemplatesByCollection,
@@ -16,7 +17,11 @@ import {
   Collection,
   emptyCollection,
 } from '../../services/collections';
-import { PAGINATION_LIMIT, RouterQuery } from '../../utils/constants';
+import {
+  PAGINATION_LIMIT,
+  RouterQuery,
+  CARD_RENDER_TYPES,
+} from '../../utils/constants';
 import Banner from '../../components/Banner';
 import PageHeader from '../../components/PageHeader';
 import {
@@ -24,7 +29,7 @@ import {
   useAuthContext,
   useModalContext,
 } from '../../components/Provider';
-import { useNavigatorUserAgent } from '../../hooks';
+import { useNavigatorUserAgent, usePrevious } from '../../hooks';
 
 const CollectionPage = (): JSX.Element => {
   const router = useRouter();
@@ -35,6 +40,7 @@ const CollectionPage = (): JSX.Element => {
   const collection = caseSensitiveCollection
     ? caseSensitiveCollection.toLowerCase()
     : '';
+  const previousCollection = usePrevious(collection);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [lowestPrices, setLowestPrices] = useState<{ [id: string]: string }>(
     {}
@@ -60,6 +66,7 @@ const CollectionPage = (): JSX.Element => {
       type: collection,
       page: prefetchPageNumber,
     });
+
     setPrefetchedTemplates(prefetchedResult as Template[]);
 
     if (!prefetchedResult.length) {
@@ -83,12 +90,14 @@ const CollectionPage = (): JSX.Element => {
 
   const fetchCollection = async () => {
     try {
+      setIsLoading(true);
       const collectionResult = await getCollection(collection);
       setCollectionData(collectionResult);
 
       const templates = await getTemplatesByCollection({
         type: collection,
       });
+
       const lowestPricesResult = await getLowestPricesForAllCollectionTemplates(
         {
           type: collection,
@@ -113,8 +122,11 @@ const CollectionPage = (): JSX.Element => {
 
   useEffect(() => {
     (async () => {
-      if (collection && !renderedTemplates.length) {
-        fetchCollection();
+      if (
+        collection &&
+        (!renderedTemplates.length || collection !== previousCollection)
+      ) {
+        await fetchCollection();
       }
     })();
   }, [collection]);
@@ -155,15 +167,10 @@ const CollectionPage = (): JSX.Element => {
       );
     }
 
-    if (!renderedTemplates.length) {
-      return (
-        <ErrorComponent errorMessage="No templates were found for this collection type." />
-      );
-    }
-
     const {
       name,
       img,
+      author,
       data: { description },
     } = collectionData;
 
@@ -175,15 +182,25 @@ const CollectionPage = (): JSX.Element => {
           description={description}
           type="collection"
           hasEditFunctionality={isEditButtonVisible}
+          author={author}
         />
-        <Grid items={renderedTemplates} />
-        <PaginationButton
-          onClick={showNextPage}
-          isHidden={renderedTemplates.length < PAGINATION_LIMIT}
-          isLoading={isLoadingNextPage}
-          disabled={prefetchPageNumber === -1}
-          autoLoad
-        />
+        {renderedTemplates.length ? (
+          <>
+            <Grid items={renderedTemplates} />
+            <PaginationButton
+              onClick={showNextPage}
+              isHidden={renderedTemplates.length < PAGINATION_LIMIT}
+              isLoading={isLoadingNextPage}
+              disabled={prefetchPageNumber === -1}
+              autoLoad
+            />
+          </>
+        ) : (
+          <EmptySectionContent
+            subtitle="No templates were found for this collection type."
+            hasTopBorder
+          />
+        )}
       </>
     );
   };

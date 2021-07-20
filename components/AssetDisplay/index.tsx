@@ -13,6 +13,7 @@ type Props = {
   model?: string;
   stage?: string;
   skybox?: string;
+  created?: string;
   templateName: string;
 };
 
@@ -22,15 +23,23 @@ export const AssetDisplay = ({
   model,
   stage,
   skybox,
+  created,
   templateName,
 }: Props): JSX.Element => {
   let asset;
   if (video) {
-    asset = <AssetVideo video={video} />;
+    asset = <AssetVideo video={video} created={created} />;
   } else if (model) {
     asset = <AssetModelWithNoSsr model={model} stage={stage} skybox={skybox} />;
   } else if (image) {
-    asset = <AssetImage image={image} templateName={templateName} lightbox />;
+    asset = (
+      <AssetImage
+        image={image}
+        templateName={templateName}
+        lightbox
+        created={created}
+      />
+    );
   }
 
   return <AssetDisplayContainer>{asset}</AssetDisplayContainer>;
