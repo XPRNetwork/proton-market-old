@@ -17,7 +17,7 @@ This is built off of atomicassets NFT framework.
 Run a docker container:
 
 ```
-docker build nft-demo .
+docker build market
 
 docker images
 
@@ -27,7 +27,7 @@ docker run -p 3000:3000 -i -d [image id]
 ### npm
 
 ```
-git clone https://github.com/ProtonProtocol/nft-demo.git
+git clone https://github.com/ProtonProtocol/market.git
 
 npm install
 
