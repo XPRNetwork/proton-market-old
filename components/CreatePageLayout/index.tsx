@@ -1,6 +1,4 @@
-import { FC, useEffect } from 'react';
-import PreviewTemplateCard from '../PreviewTemplateCard';
-import { useCreateAssetContext } from '../Provider';
+import TemplateCard from '../TemplateCard';
 import {
   Container,
   Row,
@@ -8,49 +6,32 @@ import {
   RightColumn,
   ElementTitle,
 } from './CreatePageLayout.styled';
-import { fileReader } from '../../utils';
+import { CarouselCollection } from '../CollectionsCarousel';
 
-const CreatePageLayout: FC<{ children: JSX.Element }> = ({ children }) => {
-  const {
-    setTemplateImage,
-    setTemplateVideo,
-    templateUploadedFile,
-    selectedCollection,
-    templateName,
-    templateImage,
-    templateVideo,
-    maxSupply,
-  } = useCreateAssetContext();
+type Props = {
+  children: JSX.Element;
+  templateVideo: string;
+  templateImage: string;
+  templateName: string;
+  selectedCollection: CarouselCollection;
+  maxSupply: string;
+};
 
-  useEffect(() => {
-    if (templateUploadedFile && window) {
-      const filetype = templateUploadedFile.type;
-      if (filetype.includes('video')) {
-        const readerSetTemplateVideo = (result) => {
-          setTemplateImage('');
-          setTemplateVideo(result);
-        };
-        fileReader(readerSetTemplateVideo, templateUploadedFile);
-      } else {
-        const readerSetTemplateImage = (result) => {
-          setTemplateVideo('');
-          setTemplateImage(result);
-        };
-        fileReader(readerSetTemplateImage, templateUploadedFile);
-      }
-    } else {
-      setTemplateImage('');
-      setTemplateVideo('');
-    }
-  }, [templateUploadedFile]);
-
+const CreatePageLayout = ({
+  children,
+  templateVideo,
+  templateImage,
+  templateName,
+  selectedCollection,
+  maxSupply,
+}: Props): JSX.Element => {
   return (
     <Container>
       <Row>
         <LeftColumn>{children}</LeftColumn>
         <RightColumn>
           <ElementTitle>Preview</ElementTitle>
-          <PreviewTemplateCard
+          <TemplateCard
             templateVideo={templateVideo}
             templateImage={templateImage}
             templateName={templateName}
@@ -58,6 +39,10 @@ const CreatePageLayout: FC<{ children: JSX.Element }> = ({ children }) => {
             collectionDisplayName={selectedCollection.name}
             collectionName={selectedCollection.collection_name}
             maxSupply={maxSupply}
+            noHoverEffect
+            noIpfsConversion
+            isStatic
+            autoPlay
             hasPlaceholderIcon={!selectedCollection.name}
           />
         </RightColumn>

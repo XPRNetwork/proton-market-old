@@ -3,7 +3,6 @@ import styled from 'styled-components';
 type TooltipContentProps = {
   isActive: boolean;
   numberOfLines: number;
-  isLeftAlignedToParent?: boolean;
 };
 
 export const TooltipIconContainer = styled.div`
@@ -31,12 +30,6 @@ export const TooltipContent = styled.p<TooltipContentProps>`
     numberOfLines && numberOfLines > 1 ? numberOfLines * -25 : -30}px;
   right: -62px;
   text-align: center;
-
-  ${({ isLeftAlignedToParent }) =>
-    isLeftAlignedToParent &&
-    `
-    left: 0;
-  `}
 
   ::before {
     content: '';

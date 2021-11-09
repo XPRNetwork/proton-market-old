@@ -212,10 +212,7 @@ const SalesHistoryTable = ({
   const fetchNextAssetPage = async () => {
     if (!asset) return;
     const assetId = asset.asset_id || asset.assetId;
-    const sales = await getSalesHistoryForAsset(
-      assetId,
-      salesById[assetId].page
-    );
+    const sales = await getSalesHistoryForAsset(assetId, 1);
     setSalesById((prevSales) => ({
       ...prevSales,
       [assetId]: {

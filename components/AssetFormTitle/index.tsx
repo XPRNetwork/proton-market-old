@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import CollectionIcon from '../CollectionIcon';
 import {
@@ -20,11 +20,10 @@ type Props = {
   collectionImage: string;
   assetIds?: string[];
   saleIds?: string[];
-  isRefetchingAssets?: boolean;
   setCurrentAssetAsModalProps?: () => void;
 };
 
-const AssetFormTitle: FC<Props> = ({
+const AssetFormTitle = ({
   templateName,
   collectionName,
   collectionDisplayName,
@@ -32,13 +31,12 @@ const AssetFormTitle: FC<Props> = ({
   collectionImage,
   assetIds,
   saleIds,
-  isRefetchingAssets,
   setCurrentAssetAsModalProps,
-}) => {
+}: Props): JSX.Element => {
   const router = useRouter();
   const { currentUser } = useAuthContext();
-  const actor = currentUser ? currentUser.actor : '';
-  const isMyTemplate = currentUser && router.query.chainAccount === actor;
+  const isMyTemplate =
+    currentUser && router.query.chainAccount === currentUser.actor;
   const redirectToAuthor = () => router.push(`/user/${collectionAuthor}`);
   const redirectToCollection = () => router.push(`/${collectionName}`);
 
@@ -54,13 +52,11 @@ const AssetFormTitle: FC<Props> = ({
       </CollectionNameButton>
       <NameContainer>
         <Name>{templateName}</Name>
-        {actor && (
+        {isMyTemplate && (
           <AssetFormPopupMenu
             setCurrentAssetAsModalProps={setCurrentAssetAsModalProps}
             assetIds={assetIds}
             saleIds={saleIds}
-            isMyTemplate={isMyTemplate}
-            isRefetchingAssets={isRefetchingAssets}
             isTemplateCreator={
               currentUser && collectionAuthor === currentUser.actor
             }

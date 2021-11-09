@@ -141,6 +141,7 @@ export const MintAssetModal = (): JSX.Element => {
         <HalfButton
           onClick={mintNfts}
           fullWidth={isMobile}
+          margin="0 0 20px"
           disabled={
             parseInt(amount) === 0 ||
             isNaN(parseInt(amount)) ||

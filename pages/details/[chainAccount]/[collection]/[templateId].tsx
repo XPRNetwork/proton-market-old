@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import DetailsLayout from '../../../../components/DetailsLayout';
@@ -13,14 +12,12 @@ import {
 } from '../../../../components/Provider';
 import { getTemplateDetails, Template } from '../../../../services/templates';
 import {
-  getAllUserAssetsByTemplate,
   getUserTemplateAssets,
   Asset,
   FullSaleDataByAssetId,
 } from '../../../../services/assets';
 import fees from '../../../../services/fees';
 import { TAB_TYPES, RouterQuery } from '../../../../utils/constants';
-import { delay } from '../../../../utils';
 
 const emptyTemplateDetails = {
   lowestPrice: '',
@@ -71,7 +68,6 @@ const MyNFTsTemplateDetail = (): JSX.Element => {
   const [assetIds, setAssetIds] = useState<string[]>([]);
   const [saleIds, setSaleIds] = useState<string[]>();
   const [activeTab, setActiveTab] = useState<string>(TAB_TYPES.ITEM);
-  const [isRefetching, setIsRefetching] = useState<boolean>(false);
 
   const isSelectedAssetBeingSold =
     saleDataByAssetId[currentAsset.asset_id] &&
@@ -86,7 +82,6 @@ const MyNFTsTemplateDetail = (): JSX.Element => {
       img: collectionImage,
     },
     immutable_data: { image, name, desc, video, model, stage, skybox },
-    created_at_time,
   } = template;
 
   const fetchPageData = async () => {
@@ -96,15 +91,10 @@ const MyNFTsTemplateDetail = (): JSX.Element => {
 
       const templateDetails = await getTemplateDetails(collection, templateId);
 
-      let { assets, saleData } = await getUserTemplateAssets(owner, templateId);
-
-      const lastAssetTemplateMint =
-        assets.length > 0 ? assets[assets.length - 1].template_mint : '1';
-      if (lastAssetTemplateMint === '0') {
-        assets = assets.filter((asset) => asset.template_mint !== '0');
-        // await left out purposefully so that refetch runs in background
-        checkSerialAndRefetch();
-      }
+      const { assets, saleData } = await getUserTemplateAssets(
+        owner,
+        templateId
+      );
 
       const assetIds = assets
         .filter(({ asset_id }) => !saleData[asset_id])
@@ -136,6 +126,7 @@ const MyNFTsTemplateDetail = (): JSX.Element => {
           saleId: saleData[asset_id] ? saleData[asset_id].saleId : '',
         }));
       }
+
       setAssetIds(assetIds);
       setSaleIds(saleIds);
       setTemplateAssets(assets);
@@ -147,24 +138,6 @@ const MyNFTsTemplateDetail = (): JSX.Element => {
     }
   };
 
-  const checkSerialAndRefetch = async () => {
-    const owner = currentUser ? currentUser.actor : '';
-    let lastAssetTemplateMint = '0';
-
-    setIsRefetching(true);
-    while (lastAssetTemplateMint === '0') {
-      await delay(10000);
-      const refetchedAssets = await getAllUserAssetsByTemplate(
-        owner,
-        templateId
-      );
-      lastAssetTemplateMint =
-        refetchedAssets[refetchedAssets.length - 1].template_mint;
-    }
-    fetchPageData();
-    setIsRefetching(false);
-  };
-
   useEffect(() => {
     if (collection && templateId) {
       fetchPageData();
@@ -172,20 +145,19 @@ const MyNFTsTemplateDetail = (): JSX.Element => {
   }, [collection, templateId]);
 
   useEffect(() => {
-    const queryValuesPresent = chainAccount && collection && templateId;
-    const isNotOwner = !currentUser || currentUser.actor !== chainAccount;
-
-    if (queryValuesPresent) {
-      router.push('/');
-    } else if (isNotOwner) {
+    if (
+      chainAccount &&
+      collection &&
+      templateId &&
+      (!currentUser || currentUser.actor !== chainAccount)
+    ) {
       router.push(`/${collection}/${templateId}`);
-    } else {
-      (async () => {
-        if (currentUser && currentUser.actor) {
-          await fees.refreshRamInfoForUser(currentUser.actor);
-        }
-      })();
     }
+    (async () => {
+      if (currentUser && currentUser.actor) {
+        await fees.refreshRamInfoForUser(currentUser.actor);
+      }
+    })();
   }, [chainAccount, collection, templateId, currentUser]);
 
   const setCurrentAssetAsModalProps = () => {
@@ -234,7 +206,6 @@ const MyNFTsTemplateDetail = (): JSX.Element => {
         collectionName={collection_name}
         collectionAuthor={author}
         collectionImage={collectionImage}
-        createdAtTime={created_at_time}
         error={error}
         image={image}
         video={video}
@@ -245,7 +216,6 @@ const MyNFTsTemplateDetail = (): JSX.Element => {
         assetIds={assetIds}
         saleIds={saleIds}
         activeTab={activeTab}
-        isRefetchingAssets={isRefetching}
         setActiveTab={setActiveTab}
         setCurrentAssetAsModalProps={setCurrentAssetAsModalProps}>
         <AssetFormSell
@@ -255,7 +225,6 @@ const MyNFTsTemplateDetail = (): JSX.Element => {
           maxSupply={max_supply}
           buttonText={buttonText}
           assetId={currentAsset.asset_id}
-          isRefetchingAssets={isRefetching}
           handleButtonClick={handleButtonClick}
           setCurrentAsset={setCurrentAsset}
         />

@@ -35,3 +35,9 @@ export const CollectionName = styled.p`
   white-space: nowrap;
   width: 100%;
 `;
+
+export const CollectionSubName = styled.p`
+  font-size: 12px;
+  line-height: 1.67;
+  color: #808080;
+`;

@@ -66,6 +66,7 @@ export const BurnAssetModal = (): JSX.Element => {
           fullWidth={isMobile}
           color="#f94e6c"
           hoverColor="#ff778e"
+          margin="0 0 12px"
           onClick={burn}>
           Burn NFT
         </HalfButton>

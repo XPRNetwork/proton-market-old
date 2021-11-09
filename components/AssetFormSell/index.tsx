@@ -17,7 +17,6 @@ type Props = {
   maxSupply: string;
   buttonText: string;
   assetId: string;
-  isRefetchingAssets: boolean;
   handleButtonClick: () => void;
   setCurrentAsset: Dispatch<SetStateAction<Asset>>;
 };
@@ -29,7 +28,6 @@ export const AssetFormSell = ({
   maxSupply,
   buttonText,
   assetId,
-  isRefetchingAssets,
   handleButtonClick,
   setCurrentAsset,
 }: Props): JSX.Element => {
@@ -38,38 +36,6 @@ export const AssetFormSell = ({
       return asset.asset_id === id;
     });
     setCurrentAsset(dropdownAsset);
-  };
-
-  const getDropdown = () => {
-    if (isRefetchingAssets && !dropdownAssets.length) {
-      return (
-        <DisabledInput placeholder="Preparing newly minted NFTs..." disabled />
-      );
-    } else if (!dropdownAssets.length) {
-      return <DisabledInput placeholder="No assets" disabled />;
-    } else {
-      return (
-        <DropdownMenu
-          name="Available Assets For Sale"
-          value={assetId}
-          onChange={(e) => handleDropdownSelect(e.target.value)}>
-          <option key="blank" value="" disabled>
-            - - Select a serial number - -
-          </option>
-          {dropdownAssets.length > 0 &&
-            dropdownAssets.map(({ asset_id, template_mint, salePrice }) => (
-              <option key={template_mint} value={asset_id}>
-                #{template_mint} - {salePrice || 'Not for sale'}
-              </option>
-            ))}
-          {isRefetchingAssets ? (
-            <option key="blank" value="" disabled>
-              Loading new NFTs...
-            </option>
-          ) : null}
-        </DropdownMenu>
-      );
-    }
   };
 
   return (
@@ -84,7 +50,24 @@ export const AssetFormSell = ({
         <Amount>{maxSupply === '0' ? 'Unlimited' : maxSupply}</Amount>
       </Row>
       <General>Serial number</General>
-      {getDropdown()}
+      {dropdownAssets.length ? (
+        <DropdownMenu
+          name="Available Assets For Sale"
+          value={assetId}
+          onChange={(e) => handleDropdownSelect(e.target.value)}>
+          <option key="blank" value="" disabled>
+            - - Select a serial number - -
+          </option>
+          {dropdownAssets.length > 0 &&
+            dropdownAssets.map(({ asset_id, template_mint, salePrice }) => (
+              <option key={template_mint} value={asset_id}>
+                #{template_mint} - {salePrice || 'Not for sale'}
+              </option>
+            ))}
+        </DropdownMenu>
+      ) : (
+        <DisabledInput placeholder="No assets" disabled />
+      )}
       <Button
         cancel={buttonText.toLowerCase().includes('cancel')}
         fullWidth

@@ -2,7 +2,7 @@ import { ConnectWallet } from '@proton/web-sdk';
 import { LinkSession, Link } from '@proton/link';
 import logoUrl from '../public/logo.svg';
 import proton from './proton-rpc';
-import { DEFAULT_SCHEMA, TOKEN_PRECISION } from '../utils/constants';
+import { DEFAULT_SCHEMA } from '../utils/constants';
 import fees, { MintFee } from '../services/fees';
 
 export interface User {
@@ -144,7 +144,7 @@ class ProtonSDK {
 
   constructor() {
     this.appName = 'Proton Market';
-    this.requestAccount = 'nftmarket';
+    this.requestAccount = 'protonmarket';
     this.session = null;
     this.link = null;
   }
@@ -450,12 +450,6 @@ class ProtonSDK {
     const hasEnoughAccountRam = mintFee.accountRamFee.raw === 0;
     const hasEnoughContractRam = mintFee.specialMintFee.raw === 0;
 
-    console.log(
-      'generateRamActions ',
-      hasInitializedStorage,
-      hasEnoughAccountRam,
-      hasEnoughContractRam
-    );
     return [
       hasInitializedStorage
         ? undefined
@@ -549,8 +543,6 @@ class ProtonSDK {
       author,
       mintFee,
     });
-
-    console.log('createNft Ram Actions: ', JSON.stringify(ramActions));
 
     const default_template = {
       series: '1',
@@ -676,19 +668,11 @@ class ProtonSDK {
     ];
 
     try {
-      console.log('createNft, session? ', this.session);
       if (!this.session) {
         throw new Error(
           'Unable to create and mint a collection, schema, template, and assets without logging in.'
         );
       }
-
-      console.log(
-        'createNft actions: ',
-        JSON.stringify({
-          actions: [...ramActions, ...actions],
-        })
-      );
 
       const result = await this.session.transact(
         {
@@ -704,7 +688,6 @@ class ProtonSDK {
         transactionId: result.processed.id,
       };
     } catch (e) {
-      console.log('createNft Error: ', JSON.stringify(e));
       return {
         success: false,
         error:
@@ -884,7 +867,6 @@ class ProtonSDK {
       mintFee,
     });
 
-    console.log('createTemplateAssets ramActions: ', ramActions);
     const default_template = {
       series: '1',
       name: template_name,
@@ -970,17 +952,11 @@ class ProtonSDK {
     ];
 
     try {
-      console.log('createTemplateAssets this.session?', this.session);
       if (!this.session) {
         throw new Error(
           'Unable to create a template and mint assets without logging in.'
         );
       }
-
-      console.log(
-        'createTemplateAssets transact :',
-        JSON.stringify({ actions: [...ramActions, ...actions] })
-      );
       const result = await this.session.transact(
         { actions: [...ramActions, ...actions] },
         { broadcast: true }
@@ -993,7 +969,6 @@ class ProtonSDK {
         transactionId: result.processed.id,
       };
     } catch (e) {
-      console.log('createTemplateAssets error', JSON.stringify(e));
       return {
         success: false,
         error:
@@ -1363,15 +1338,6 @@ class ProtonSDK {
     }
   };
 
-  /**
-   * Purchase a specific asset for sale.
-   *
-   * @param {string}   buyer          Buyer of the asset for sale.
-   * @param {string[]} amount         Amount to buy the asset for sale.
-   * @param {string[]} sale_id        ID of the specific asset sale.
-   * @return {Response}               Returns an object indicating the success of the transaction and transaction ID.
-   */
-
   purchaseSale = async ({
     buyer,
     amount,
@@ -1433,342 +1399,6 @@ class ProtonSDK {
         success: false,
         error:
           message || 'An error has occurred while trying to purchase an item.',
-      };
-    }
-  };
-
-  /**
-   * Create an auction for a specific asset.
-   *
-   * @param {string}   asset_id       ID of the asset to put up for auction.
-   * @param {string[]} starting_bid   Minimum starting bid for the auction.
-   * @param {string[]} duration       Duration in seconds the asset will be up for auction.
-   * @return {Response}               Returns an object indicating the success of the transaction and transaction ID.
-   */
-
-  createAuction = async ({
-    asset_id,
-    starting_bid,
-    duration,
-  }: {
-    asset_id: string;
-    starting_bid: string;
-    duration: string;
-  }): Promise<Response> => {
-    try {
-      if (!this.session) {
-        throw new Error('Unable to create an auction without logging in.');
-      }
-
-      const seller = this.session.auth.actor;
-      const actions = [
-        {
-          account: 'atomicmarket',
-          name: 'announceauct',
-          authorization: [
-            {
-              actor: seller,
-              permission: 'active',
-            },
-          ],
-          data: {
-            seller,
-            asset_ids: [asset_id],
-            starting_bid,
-            duration,
-            maker_marketplace: 'fees.market',
-          },
-        },
-        {
-          account: 'atomicassets',
-          name: 'transfer',
-          authorization: [
-            {
-              actor: seller,
-              permission: 'active',
-            },
-          ],
-          data: {
-            from: seller,
-            to: 'atomicmarket',
-            asset_ids: [asset_id],
-            memo: 'auction',
-          },
-        },
-      ];
-
-      const result = await this.session.transact(
-        { actions },
-        { broadcast: true }
-      );
-
-      await fees.refreshRamInfoForUser(seller);
-
-      return {
-        success: true,
-        transactionId: result.processed.id,
-      };
-    } catch (e) {
-      const message = e.message[0].toUpperCase() + e.message.slice(1);
-      return {
-        success: false,
-        error:
-          message || 'An error has occurred while trying to create an auction.',
-      };
-    }
-  };
-
-  /**
-   * Make a bid on an auction for a specific asset.
-   *
-   * @param {string}   auction_id     ID of the auction to make a bid on.
-   * @param {string[]} bid            Bid amount on the auction.
-   * @return {Response}               Returns an object indicating the success of the transaction and transaction ID.
-   */
-
-  bidOnAuction = async ({
-    auction_id,
-    bid,
-  }: {
-    auction_id: string;
-    bid: string;
-  }): Promise<Response> => {
-    try {
-      if (!this.session) {
-        throw new Error('Unable to bid on an auction without logging in.');
-      }
-
-      const bidder = this.session.auth.actor;
-      const currentBalance = await proton.getAtomicMarketBalance(bidder);
-      const [bidAmount, bidToken] = bid.split(' ');
-      const [balanceAmount, balanceToken] = currentBalance.split(' ');
-      const balanceMinusBid = parseFloat(bidAmount) - parseFloat(balanceAmount);
-
-      const actions = [
-        balanceMinusBid > 0
-          ? {
-              account: 'xtokens',
-              name: 'transfer',
-              authorization: [
-                {
-                  actor: bidder,
-                  permission: 'active',
-                },
-              ],
-              data: {
-                from: bidder,
-                to: 'atomicmarket',
-                quantity:
-                  bidToken === balanceToken
-                    ? `${balanceMinusBid.toFixed(TOKEN_PRECISION)} ${bidToken}`
-                    : bid,
-                memo: 'deposit',
-              },
-            }
-          : undefined,
-        {
-          account: 'atomicmarket',
-          name: 'auctionbid',
-          authorization: [
-            {
-              actor: bidder,
-              permission: 'active',
-            },
-          ],
-          data: {
-            bidder,
-            auction_id,
-            bid,
-            taker_marketplace: 'fees.market',
-          },
-        },
-      ].filter((action) => action !== undefined);
-
-      const result = await this.session.transact(
-        { actions },
-        { broadcast: true }
-      );
-
-      await fees.refreshRamInfoForUser(bidder);
-
-      return {
-        success: true,
-        transactionId: result.processed.id,
-      };
-    } catch (e) {
-      const message = e.message[0].toUpperCase() + e.message.slice(1);
-      return {
-        success: false,
-        error:
-          message || 'An error has occurred while trying to bid on an auction.',
-      };
-    }
-  };
-
-  /**
-   * Claim the tokens received in an auction as the seller (can only be done
-   * after the auction duration times out).
-   *
-   * @param {string}   auction_id     ID of the auction to confirm.
-   * @return {Response}               Returns an object indicating the success of the transaction and transaction ID.
-   */
-
-  claimAuctionSell = async ({
-    auction_id,
-  }: {
-    auction_id: string;
-  }): Promise<Response> => {
-    try {
-      if (!this.session) {
-        throw new Error('Unable to claim an auction without logging in.');
-      }
-
-      const seller = this.session.auth.actor;
-      const actions = [
-        {
-          account: 'atomicmarket',
-          name: 'auctclaimsel',
-          authorization: [
-            {
-              actor: seller,
-              permission: 'active',
-            },
-          ],
-          data: {
-            auction_id,
-          },
-        },
-      ];
-
-      const result = await this.session.transact(
-        { actions },
-        { broadcast: true }
-      );
-
-      await fees.refreshRamInfoForUser(seller);
-
-      return {
-        success: true,
-        transactionId: result.processed.id,
-      };
-    } catch (e) {
-      const message = e.message[0].toUpperCase() + e.message.slice(1);
-      return {
-        success: false,
-        error:
-          message || 'An error has occurred while trying to claim an auction.',
-      };
-    }
-  };
-
-  /**
-   * Claim the asset won in an auction as the buyer (can only be done after the
-   * auction duration times out).
-   *
-   * @param {string}   auction_id     ID of the auction to confirm.
-   * @return {Response}               Returns an object indicating the success
-   * of the transaction and transaction ID.
-   */
-
-  claimAuctionBuy = async ({
-    auction_id,
-  }: {
-    auction_id: string;
-  }): Promise<Response> => {
-    try {
-      if (!this.session) {
-        throw new Error('Unable to claim an auction without logging in.');
-      }
-
-      const buyer = this.session.auth.actor;
-      const actions = [
-        {
-          account: 'atomicmarket',
-          name: 'auctclaimbuy',
-          authorization: [
-            {
-              actor: buyer,
-              permission: 'active',
-            },
-          ],
-          data: {
-            auction_id,
-          },
-        },
-      ];
-
-      const result = await this.session.transact(
-        { actions },
-        { broadcast: true }
-      );
-
-      await fees.refreshRamInfoForUser(buyer);
-
-      return {
-        success: true,
-        transactionId: result.processed.id,
-      };
-    } catch (e) {
-      const message = e.message[0].toUpperCase() + e.message.slice(1);
-      return {
-        success: false,
-        error:
-          message || 'An error has occurred while trying to claim an auction.',
-      };
-    }
-  };
-
-  /**
-   * Cancel a specific auction.
-   *
-   * @param {string}   auction_id     ID of the auction to cancel.
-   * @return {Response}               Returns an object indicating the success of the transaction and transaction ID.
-   */
-
-  cancelAuction = async ({
-    auction_id,
-  }: {
-    auction_id: string;
-  }): Promise<Response> => {
-    try {
-      if (!this.session) {
-        throw new Error('Unable to cancel an auction without logging in.');
-      }
-
-      const seller = this.session.auth.actor;
-      const actions = [
-        {
-          account: 'atomicmarket',
-          name: 'cancelauct',
-          authorization: [
-            {
-              actor: seller,
-              permission: 'active',
-            },
-          ],
-          data: {
-            auction_id,
-          },
-        },
-      ];
-
-      const result = await this.session.transact(
-        { actions },
-        { broadcast: true }
-      );
-
-      await fees.refreshRamInfoForUser(seller);
-
-      return {
-        success: true,
-        transactionId: result.processed.id,
-      };
-    } catch (e) {
-      const message = e.message[0].toUpperCase() + e.message.slice(1);
-      return {
-        success: false,
-        error:
-          message || 'An error has occurred while trying to cancel an auction.',
       };
     }
   };

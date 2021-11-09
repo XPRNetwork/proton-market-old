@@ -1,5 +1,4 @@
 import {
-  FC,
   useEffect,
   useState,
   MouseEvent,
@@ -38,27 +37,24 @@ type Props = {
   description: string;
   buttonText: string;
   amount: string;
-  numSales: number;
   listingFee: ListingFee;
+  numSales: number;
   onButtonClick: () => Promise<void>;
   setAmount: Dispatch<SetStateAction<string>>;
   setListingFee: Dispatch<SetStateAction<ListingFee>>;
 };
 
-const SaleModal: FC<Props> = ({
+const SaleModal = ({
   title,
   description,
   buttonText,
   amount,
+  listingFee,
   numSales,
-  listingFee = {
-    display: '0.00',
-    raw: null,
-  },
   setAmount,
   onButtonClick,
   setListingFee,
-}) => {
+}: Props): JSX.Element => {
   const { closeModal } = useModalContext();
   const { currentUser } = useAuthContext();
   const { isMobile } = useWindowSize();
@@ -136,7 +132,7 @@ const SaleModal: FC<Props> = ({
   );
 };
 
-export const CreateSaleModal: FC = () => {
+export const CreateSaleModal = (): JSX.Element => {
   const { currentUser } = useAuthContext();
   const { closeModal, modalProps } = useModalContext();
   const { assetId, fetchPageData } = modalProps as CreateSaleModalProps;
@@ -187,9 +183,9 @@ export const CreateSaleModal: FC = () => {
   );
 };
 
-export const CreateMultipleSalesModal: FC = () => {
+export const CreateMultipleSalesModal = (): JSX.Element => {
   const { currentUser } = useAuthContext();
-  const { closeModal, modalProps, setModalProps } = useModalContext();
+  const { closeModal, modalProps } = useModalContext();
   const {
     assetIds,
     fetchPageData,
@@ -201,7 +197,6 @@ export const CreateMultipleSalesModal: FC = () => {
     raw: null,
   });
   const numSales = assetIds.length;
-  const maxNumSales = 100;
 
   const createMultipleSales = async () => {
     try {
@@ -214,52 +209,28 @@ export const CreateMultipleSalesModal: FC = () => {
       });
       const res = await ProtonSDK.createMultipleSales({
         seller: currentUser ? currentUser.actor : '',
-        assetIds: assetIds.slice(0, maxNumSales),
+        assetIds,
         price: `${formattedAmount} ${TOKEN_SYMBOL}`,
         currency: `${TOKEN_PRECISION},${TOKEN_SYMBOL}`,
         listing_fee: finalFee.raw,
       });
 
-      if (!res.success) {
-        throw new Error('Unable to list items for sale. Please try again.');
+      if (res.success) {
+        closeModal();
+        setIsModalWithFeeOpen(false);
+        fetchPageData();
       }
-
-      if (numSales > maxNumSales) {
-        setModalProps((prevModalProps) => ({
-          ...prevModalProps,
-          assetIds: assetIds.slice(maxNumSales),
-        }));
-        return;
-      }
-
-      closeModal();
-      setIsModalWithFeeOpen(false);
-      fetchPageData();
     } catch (err) {
       console.warn(err.message);
     }
   };
 
-  const description = `You have ${
-    numSales === 1 ? '1 item' : `${numSales} items`
-  } you can list for sale. ${
-    numSales > maxNumSales
-      ? `You can list ${maxNumSales} items for sale at a time due to network restrictions. `
-      : ''
-  }Enter the amount you want to sell ${
-    numSales === 1 ? 'your NFT' : 'each of your NFTs'
-  } for.`;
-
-  const buttonText = `Mark ${
-    numSales > maxNumSales ? `${maxNumSales} NFTs` : 'all'
-  } for sale`;
-
   return (
     <SaleModal
       numSales={numSales}
       title="Listing Price"
-      description={description}
-      buttonText={buttonText}
+      description={`You are putting up ${numSales} items for sale. Enter the amount you want to sell each of your NFTs for.`}
+      buttonText="Mark all for sale"
       amount={amount}
       listingFee={listingFee}
       setAmount={setAmount}
@@ -267,4 +238,8 @@ export const CreateMultipleSalesModal: FC = () => {
       onButtonClick={createMultipleSales}
     />
   );
+};
+
+SaleModal.defaultProps = {
+  listingFee: 0,
 };

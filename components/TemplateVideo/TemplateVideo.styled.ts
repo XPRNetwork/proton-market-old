@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { FadeInImageContainer } from '../../styles/FadeInImageContainer.styled';
 
 type ImageContainerProps = {
@@ -6,11 +6,16 @@ type ImageContainerProps = {
   isVideo?: boolean;
 };
 
-export const VideoContainer = styled(FadeInImageContainer)<ImageContainerProps>`
+const SquareContainerCSS = css`
   position: relative;
   width: 100%;
-  height: 270px;
+  height: 0;
   padding-bottom: 100%;
+`;
+
+export const VideoContainer = styled(FadeInImageContainer)<ImageContainerProps>`
+  ${SquareContainerCSS};
+  position: relative;
   border-radius: 8px;
   margin-bottom: 24px;
 `;
@@ -39,7 +44,7 @@ export const VideoError = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
-  border-radius: 8px;
+  border-radius: 16px;
   padding: 20px;
   font-size: 16px;
   line-height: 24px;

@@ -12,10 +12,10 @@ export const Container = styled.section<ContainerProps>`
   display: inline-grid;
   grid-column-gap: 24px;
   grid-row-gap: 24px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 
   @media (max-width: 1300px) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   ${breakpoint.mobile`
@@ -88,12 +88,13 @@ export const Subtext = styled.span`
 export const Icon = styled(IconContainer)`
   min-width: 64px;
   height: 64px;
-  margin: 0 32px;
+  margin: 0 24px 0 40px;
   padding: 0 16px;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 16px;
+  border: solid 1px #f0e8fd;
 
   @media (max-width: 1300px) {
     margin-left: 0;

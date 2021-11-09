@@ -16,10 +16,6 @@ export const PageHeaderContainer = styled.div`
   padding-bottom: 50px;
 `;
 
-export const PageHeaderAvatarContainer = styled.div`
-  position: relative;
-`;
-
 export const ImageContainer = styled.div`
   width: 120px;
   height: 120px;
@@ -31,16 +27,6 @@ export const ImageContainer = styled.div`
     width: 112px;
     height: 112px;
     margin-bottom: 24px;
-  `}
-`;
-
-export const VerifiedIconContainer = styled.div`
-  position: absolute;
-  bottom: 12px;
-  right: 0;
-
-  ${breakpoint.mobile`
-    bottom: 20px;
   `}
 `;
 
@@ -83,7 +69,7 @@ export const RoundButton = styled.button<RoundButtonProps>`
   cursor: pointer;
   outline: none;
   font-size: 16px;
-  line-height: 24px;
+  lien-height: 24px;
 
   :hover {
     background-color: rgba(230, 230, 230, 0.3);

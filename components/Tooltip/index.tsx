@@ -1,14 +1,12 @@
-import { FC, useState, ReactNode } from 'react';
+import { useState } from 'react';
 import { TooltipIconContainer, TooltipContent } from './Tooltip.styled';
 
 type Props = {
   text: string;
   numberOfLines: number;
-  isLeftAlignedToParent?: boolean;
-  children?: string | ReactNode;
 };
 
-const TooltipIcon: FC<{ color: string }> = ({ color }) => (
+const TooltipIcon = ({ color }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
     <g fillRule="nonzero" fill="none">
       <path d="M0 0h24v24H0z" />
@@ -20,35 +18,17 @@ const TooltipIcon: FC<{ color: string }> = ({ color }) => (
   </svg>
 );
 
-const Tooltip: FC<Props> = ({
-  text,
-  numberOfLines,
-  isLeftAlignedToParent,
-  children,
-}) => {
+const Tooltip = ({ text, numberOfLines }: Props): JSX.Element => {
   const [isActive, setIsActive] = useState<boolean>(false);
-
-  const hoverContent = children ? (
-    <div
-      onMouseEnter={() => setIsActive(true)}
-      onMouseLeave={() => setIsActive(false)}>
-      {children}
-    </div>
-  ) : (
-    <TooltipIconContainer
-      onMouseEnter={() => setIsActive(true)}
-      onMouseLeave={() => setIsActive(false)}>
-      <TooltipIcon color={isActive ? '#1A1A1A' : '#CCC'} />
-    </TooltipIconContainer>
-  );
 
   return (
     <>
-      {hoverContent}
-      <TooltipContent
-        numberOfLines={numberOfLines}
-        isActive={isActive}
-        isLeftAlignedToParent={isLeftAlignedToParent}>
+      <TooltipIconContainer
+        onMouseEnter={() => setIsActive(true)}
+        onMouseLeave={() => setIsActive(false)}>
+        <TooltipIcon color={isActive ? '#1A1A1A' : '#CCC'} />
+      </TooltipIconContainer>
+      <TooltipContent numberOfLines={numberOfLines} isActive={isActive}>
         {text}
       </TooltipContent>
     </>

@@ -39,40 +39,6 @@ export const emptyCollection: Collection = {
   },
 };
 
-export const getCollection = async (
-  collectionName: string
-): Promise<Collection> => {
-  try {
-    const result = await getFromApi<Collection>(
-      `${process.env.NEXT_PUBLIC_NFT_ENDPOINT}/atomicassets/v1/collections/${collectionName}`
-    );
-
-    if (!result.success) {
-      throw new Error((result.message as unknown) as string);
-    }
-    return result.data;
-  } catch (e) {
-    throw new Error(e);
-  }
-};
-
-export const getAuthorsCollections = async (
-  author: string
-): Promise<Collection[]> => {
-  try {
-    const result = await getFromApi<Collection[]>(
-      `${process.env.NEXT_PUBLIC_NFT_ENDPOINT}/atomicassets/v1/collections?author=${author}`
-    );
-
-    if (!result.success) {
-      throw new Error((result.message as unknown) as string);
-    }
-    return result.data;
-  } catch (e) {
-    throw new Error(e);
-  }
-};
-
 export type SearchCollection = {
   name: string;
   img: string | null;
@@ -119,6 +85,40 @@ export const getSearchCollections = async (): Promise<SearchCollection[]> => {
     }
 
     return Object.values(collectionsByName);
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const getCollection = async (
+  collectionName: string
+): Promise<Collection> => {
+  try {
+    const result = await getFromApi<Collection>(
+      `${process.env.NEXT_PUBLIC_NFT_ENDPOINT}/atomicassets/v1/collections/${collectionName}`
+    );
+
+    if (!result.success) {
+      throw new Error((result.message as unknown) as string);
+    }
+    return result.data;
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const getAuthorsCollections = async (
+  author: string
+): Promise<Collection[]> => {
+  try {
+    const result = await getFromApi<Collection[]>(
+      `${process.env.NEXT_PUBLIC_NFT_ENDPOINT}/atomicassets/v1/collections?author=${author}`
+    );
+
+    if (!result.success) {
+      throw new Error((result.message as unknown) as string);
+    }
+    return result.data;
   } catch (e) {
     throw new Error(e);
   }

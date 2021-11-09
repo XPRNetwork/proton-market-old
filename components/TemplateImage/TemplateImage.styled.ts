@@ -17,6 +17,11 @@ export const ImageContainer = styled(FadeInImageContainer)<ImageContainerProps>`
   border-radius: 8px;
 `;
 
+export const DefaultImage = styled.img`
+  width: 100%;
+  height: 100%;
+`;
+
 export const Image = styled.img`
   border-radius: 8px;
   max-width: 270px;

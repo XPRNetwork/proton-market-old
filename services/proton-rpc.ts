@@ -20,31 +20,31 @@ class ProtonJs {
     this.rpc = new JsonRpc(endpoints);
   }
 
-  getAccountBalance = async (chainAccount: string): Promise<string> => {
+  getAccountBalance = async (account): Promise<string> => {
     const balance = await this.rpc.get_currency_balance(
       TOKEN_CONTRACT,
-      chainAccount,
+      account,
       TOKEN_SYMBOL
     );
     const price = balance.length ? balance[0] : `${0} ${TOKEN_SYMBOL}`;
     return formatPrice(price);
   };
 
-  getUserByChainAccount = async (chainAccount: string): Promise<User> => {
+  getUserByChainAccount = async ({ account }): Promise<User> => {
     const { rows } = await this.rpc.get_table_rows({
       scope: 'eosio.proton',
       code: 'eosio.proton',
       json: true,
       table: 'usersinfo',
-      lower_bound: chainAccount,
-      upper_bound: chainAccount,
+      lower_bound: account,
+      upper_bound: account,
     });
 
     return !rows.length ? '' : rows[0];
   };
 
-  getProfileImage = async (chainAccount: string): Promise<string> => {
-    const user = await this.getUserByChainAccount(chainAccount);
+  getProfileImage = async ({ account }): Promise<string> => {
+    const user = await this.getUserByChainAccount({ account });
     return user.avatar;
   };
 
@@ -141,10 +141,10 @@ class ProtonJs {
   getXPRtoXUSDCConversionRate = async (): Promise<number> => {
     try {
       const res = await this.rpc.get_table_rows({
+        json: true,
         code: 'proton.swaps',
         scope: 'proton.swaps',
         table: 'pools',
-        limit: -1,
       });
 
       const conversion = res.rows.filter(
@@ -162,23 +162,6 @@ class ProtonJs {
     } catch (err) {
       console.warn(err);
       return 0;
-    }
-  };
-
-  isAccountLightKYCVerified = async (
-    chainAccount: string
-  ): Promise<boolean> => {
-    try {
-      const verifiedAccounts = await this.rpc.isLightKYCVerified(chainAccount);
-
-      if (verifiedAccounts.length < 1) {
-        return false;
-      }
-
-      return verifiedAccounts[0].isLightKYCVerified;
-    } catch (err) {
-      console.warn(err);
-      return false;
     }
   };
 }

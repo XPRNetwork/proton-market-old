@@ -14,8 +14,6 @@ export const Description = styled.span<DescriptionProps>`
   color: ${({ fontColor }) => fontColor};
   font-size: 14px;
   line-height: 24px;
-  overflow-wrap: break-word;
-  width: 100%;
 `;
 
 export const More = styled.span`

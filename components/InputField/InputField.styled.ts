@@ -51,7 +51,6 @@ export const Input = styled.input`
   outline: none;
   line-height: 24px;
 
-  -moz-appearance: textfield;
   ::-webkit-inner-spin-button,
   ::-webkit-outer-spin-button {
     -webkit-appearance: none;

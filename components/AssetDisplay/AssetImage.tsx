@@ -1,14 +1,7 @@
 import { SRLWrapper, useLightbox } from 'simple-react-lightbox';
 import { Image } from './AssetDisplay.styled';
 import { IPFS_RESOLVER_IMAGE, RESIZER_IMAGE } from '../../utils/constants';
-import { useState, useEffect } from 'react';
-
-type Props = {
-  image: string;
-  templateName: string;
-  lightbox?: boolean;
-  created: string;
-};
+import { useState } from 'react';
 
 const lightboxOptions = {
   thumbnails: {
@@ -26,7 +19,15 @@ const lightboxOptions = {
   },
 };
 
-const AssetImage = ({ image, templateName, lightbox }: Props): JSX.Element => {
+const AssetImage = ({
+  image,
+  templateName,
+  lightbox,
+}: {
+  image: string;
+  templateName: string;
+  lightbox?: boolean;
+}): JSX.Element => {
   const resizedSrc = `${RESIZER_IMAGE}${IPFS_RESOLVER_IMAGE}${image}`;
   const highResSrc = `${IPFS_RESOLVER_IMAGE}${image}`;
 
@@ -39,10 +40,6 @@ const AssetImage = ({ image, templateName, lightbox }: Props): JSX.Element => {
   };
   const onImageClick = (_) => lightbox && openLightbox();
   const lightboxElements = [{ src: highResSrc, width: 'auto', height: 'auto' }];
-
-  useEffect(() => {
-    setSrc(resizedSrc);
-  }, [image, templateName]);
 
   return (
     <div>

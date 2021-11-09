@@ -21,7 +21,7 @@ type Props = {
 const StatisticCard = ({ text, subtext, imgSrc }: Props): JSX.Element => (
   <Card>
     <Icon>
-      <Image width="80px" height="auto" alt={subtext} src={imgSrc} />
+      <Image width="32px" height="auto" alt={subtext} src={imgSrc} />
     </Icon>
     <Section>
       <Text>{text}</Text>
@@ -35,8 +35,7 @@ const HomepageStatistics = (): JSX.Element => {
   const [nftsCreated, setNftsCreated] = useState<string>();
   const [transactions, setTransactions] = useState<string>();
   const [totalSales, setTotalSales] = useState<string>();
-  // const [salesToday, setSalesToday] = useState<string>();
-  // getting today's sale numbers currently disabled until we get more sales
+  const [salesToday, setSalesToday] = useState<string>();
 
   useEffect(() => {
     (async () => {
@@ -45,7 +44,7 @@ const HomepageStatistics = (): JSX.Element => {
         setNftsCreated(formatThousands(stats.nftsCreated));
         setTransactions(formatThousands(stats.transactions));
         setTotalSales(`$${formatThousands(stats.totalSales)}`);
-        // setSalesToday(`$${formatThousands(stats.salesToday)}`);
+        setSalesToday(`$${formatThousands(stats.salesToday)}`);
       } catch (err) {
         console.warn(err);
       }
@@ -69,11 +68,11 @@ const HomepageStatistics = (): JSX.Element => {
       subtext: 'TOTAL SALES',
       imgSrc: '/total-sales.svg',
     },
-    // {
-    //   text: salesToday,
-    //   subtext: 'SALES TODAY',
-    //   imgSrc: '/sales-today.svg',
-    // },
+    {
+      text: salesToday,
+      subtext: 'SALES TODAY',
+      imgSrc: '/sales-today.svg',
+    },
   ];
 
   return (

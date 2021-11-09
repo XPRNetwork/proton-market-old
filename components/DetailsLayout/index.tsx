@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, ReactNode, FC } from 'react';
+import { Dispatch, SetStateAction, ReactNode } from 'react';
 import {
   Container,
   Row,
@@ -32,13 +32,11 @@ type Props = {
   assetIds?: string[];
   saleIds?: string[];
   activeTab: string;
-  isRefetchingAssets?: boolean;
-  createdAtTime: string;
   setActiveTab: Dispatch<SetStateAction<string>>;
   setCurrentAssetAsModalProps?: () => void;
 };
 
-const DetailsLayout: FC<Props> = ({
+const DetailsLayout = ({
   children,
   image,
   video,
@@ -56,11 +54,9 @@ const DetailsLayout: FC<Props> = ({
   assetIds,
   saleIds,
   activeTab,
-  createdAtTime,
-  isRefetchingAssets,
   setActiveTab,
   setCurrentAssetAsModalProps,
-}) => {
+}: Props): JSX.Element => {
   return (
     <Container>
       <AssetMeta
@@ -80,7 +76,6 @@ const DetailsLayout: FC<Props> = ({
           stage={stage}
           skybox={skybox}
           templateName={templateName}
-          created={createdAtTime}
         />
 
         <Column>
@@ -92,7 +87,6 @@ const DetailsLayout: FC<Props> = ({
             collectionImage={collectionImage}
             saleIds={saleIds}
             assetIds={assetIds}
-            isRefetchingAssets={isRefetchingAssets}
             setCurrentAssetAsModalProps={setCurrentAssetAsModalProps}
           />
           {children}

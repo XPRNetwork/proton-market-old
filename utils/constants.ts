@@ -4,9 +4,8 @@ export const TOKEN_CONTRACT = 'xtokens';
 export const TOKEN_PRECISION = 6;
 export const SHORTENED_TOKEN_PRECISION = 2;
 export const DEFAULT_COLLECTION = 'monsters';
-export const PRICE_OF_RAM_IN_XPR = 0.0023;
-export const PAGINATION_LIMIT = 8;
-export const PROPAGATION_LAG_TIME = 900000;
+export const PRICE_OF_RAM_IN_XPR = 0.0222;
+export const PAGINATION_LIMIT = 12;
 export const LG_FILE_UPLOAD_TYPES_TEXT =
   'PNG, GIF, JPG, WEBP, or MP4. Max 30 MB.';
 export const SM_FILE_UPLOAD_TYPES_TEXT = 'PNG, GIF, JPG, or WEBP. Max 5 MB.';
@@ -30,8 +29,6 @@ export const SM_FILE_UPLOAD_TYPES = {
 export const LG_FILE_SIZE_UPLOAD_LIMIT = 30 * 1000000; // 30 MB
 export const SM_FILE_SIZE_UPLOAD_LIMIT = 5 * 1000000; // 5 MB
 export const RESIZER_IMAGE = 'https://bloks.io/cdn-cgi/image/width=500/';
-export const RESIZER_IMAGE_SM = 'https://bloks.io/cdn-cgi/image/width=250/';
-export const RESIZER_IMAGE_XSM = 'https://bloks.io/cdn-cgi/image/width=64/';
 export const IPFS_RESOLVER_IMAGE = 'https://ipfs.io/ipfs/';
 export const IPFS_RESOLVER_VIDEO = 'https://ipfs.io/ipfs/';
 export const DEFAULT_SCHEMA = {
@@ -53,35 +50,7 @@ export const TAB_TYPES = {
   GLOBAL: 'GLOBAL',
   ITEMS: 'ITEMS',
   CREATIONS: 'CREATIONS',
-  NFTS: 'NFTS',
-  CREATORS: 'CREATORS',
-  COLLECTIONS: 'COLLECTIONS',
 };
-
-export const FILTER_TYPES = {
-  NAME_AZ: {
-    label: 'Name A-Z',
-    queryParam: '&sortKey=name&sortOrder=asc',
-  },
-  NAME_ZA: {
-    label: 'Name Z-A',
-    queryParam: '&sortKey=name&sortOrder=desc',
-  },
-  OLDEST: {
-    label: 'Oldest',
-    queryParam: '&sortKey=created&sortOrder=asc',
-  },
-  NEWEST: {
-    label: 'Newest',
-    queryParam: '&sortKey=created&sortOrder=desc',
-  },
-};
-
-export const FILTER_ORDER = {
-  ASC: 'asc',
-  DESC: 'desc',
-};
-
 export const FEATURED_HOMEPAGE_COLLECTIONS = [
   { name: 'boardtodeath', displayName: 'Board To Death' },
   { name: 'restingbface', displayName: 'RBF' },
@@ -106,12 +75,6 @@ export const META = {
     'Start creating and selling your own NFTs! The best way to monetize your talent. Free to get started.',
 };
 
-export const CARD_RENDER_TYPES = {
-  TEMPLATE: 'TEMPLATE',
-  COLLECTION: 'COLLECTION',
-  CREATOR: 'CREATOR',
-  SEARCH_TEMPLATE: 'SEARCH_TEMPLATE',
-};
 export interface RouterQuery {
   [query: string]: string;
 }
@@ -126,13 +89,6 @@ export interface QueryParams {
   limit?: string | number;
   sort?: string;
   order?: string;
-  page?: number | string;
+  page?: number;
   symbol?: string;
-  q?: string;
-  pageSize?: string;
 }
-
-export type Filter = {
-  label: string;
-  queryParam: string;
-};

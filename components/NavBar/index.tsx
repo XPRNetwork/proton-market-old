@@ -180,15 +180,13 @@ const DesktopNavRoutes = () => {
     <DesktopOnlySection>
       {routes.map(({ name, path }) => {
         const isActive = router.pathname.split('/')[1] === path.split('/')[1];
-        const shouldRefresh =
-          router.pathname.includes('create') && path.includes('create');
         const isHidden = !currentUser;
         const refreshPage = () => router.reload();
         return isHidden ? null : (
           <Link href={path} passHref key={name}>
             <DesktopNavLink
               isActive={isActive}
-              onClick={shouldRefresh ? refreshPage : null}>
+              onClick={isActive ? refreshPage : null}>
               {name}
             </DesktopNavLink>
           </Link>

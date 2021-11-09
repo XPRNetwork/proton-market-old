@@ -1,9 +1,9 @@
 {
   "name": "proton-market",
-  "version": "1.1.2",
+  "version": "1.0.16",
   "private": true,
   "scripts": {
-    "dev": "NODE_ENV=development node server.js",
+    "dev": "node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "lint": "eslint --fix .",
@@ -28,7 +28,6 @@
     "react-dom": "17.0.1",
     "react-dropzone": "^11.3.2",
     "react-intersection-observer": "^8.31.1",
-    "react-lazyload": "^3.2.0",
     "simple-react-lightbox": "^3.6.6",
     "styled-components": "^5.2.1"
   },

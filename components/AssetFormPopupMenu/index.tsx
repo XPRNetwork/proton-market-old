@@ -1,5 +1,4 @@
-import { useState, useEffect, FC } from 'react';
-import Tooltip from '../Tooltip';
+import { useState, useEffect } from 'react';
 import {
   MenuContainer,
   PopupMenuButton,
@@ -22,20 +21,17 @@ type Props = {
   assetIds?: string[];
   saleIds?: string[];
   isTemplateCreator?: boolean;
-  isMyTemplate: boolean;
-  isRefetchingAssets?: boolean;
 };
 
-const AssetFormPopupMenu: FC<Props> = ({
+const AssetFormPopupMenu = ({
   setCurrentAssetAsModalProps,
   assetIds,
   saleIds,
   isTemplateCreator,
-  isMyTemplate,
-  isRefetchingAssets,
-}) => {
-  const { currentUser } = useAuthContext();
-  const actor = currentUser ? currentUser.actor : '';
+}: Props): JSX.Element => {
+  const {
+    currentUser: { actor },
+  } = useAuthContext();
   const { openModal, modalProps, setModalProps } = useModalContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isModalWithFeeOpen, setIsModalWithFeeOpen] = useState<boolean>(false);
@@ -65,31 +61,22 @@ const AssetFormPopupMenu: FC<Props> = ({
 
   const popupMenuItems = [
     {
-      isHidden: !isMyTemplate || !assetIds || assetIds.length === 0,
+      isHidden: !assetIds || assetIds.length === 0,
       name: 'Mark all for sale',
-      tooltip: isRefetchingAssets
-        ? {
-            text:
-              'Currently unable to mark all for sale while processing newly minted assets.',
-            numberOfLines: 3.25,
-          }
-        : undefined,
-      onClick: isRefetchingAssets
-        ? null
-        : () => {
-            setIsOpen(false);
-            setIsModalWithFeeOpen(true);
-            openModal(MODAL_TYPES.CREATE_MULTIPLE_SALES);
-            setModalProps((previousModalProps) => ({
-              ...previousModalProps,
-              accountRam,
-              conversionRate,
-              setIsModalWithFeeOpen,
-            }));
-          },
+      onClick: () => {
+        setIsOpen(false);
+        setIsModalWithFeeOpen(true);
+        openModal(MODAL_TYPES.CREATE_MULTIPLE_SALES);
+        setModalProps((previousModalProps) => ({
+          ...previousModalProps,
+          accountRam,
+          conversionRate,
+          setIsModalWithFeeOpen,
+        }));
+      },
     },
     {
-      isHidden: !isMyTemplate || isMintAssetModalHidden(),
+      isHidden: isMintAssetModalHidden(),
       name: 'Mint more assets',
       onClick: () => {
         setIsOpen(false);
@@ -104,7 +91,7 @@ const AssetFormPopupMenu: FC<Props> = ({
       },
     },
     {
-      isHidden: !isMyTemplate || assetIds.length === 0,
+      isHidden: assetIds.length === 0,
       name: 'Transfer NFT',
       onClick: () => {
         setIsOpen(false);
@@ -113,7 +100,7 @@ const AssetFormPopupMenu: FC<Props> = ({
       },
     },
     {
-      isHidden: !isMyTemplate || assetIds.length === 0,
+      isHidden: assetIds.length === 0,
       name: 'Burn NFT',
       onClick: () => {
         setIsOpen(false);
@@ -122,7 +109,7 @@ const AssetFormPopupMenu: FC<Props> = ({
       },
     },
     {
-      isHidden: !isMyTemplate || !saleIds || saleIds.length === 0,
+      isHidden: !saleIds || saleIds.length === 0,
       name: 'Cancel all sales',
       onClick: () => {
         setIsOpen(false);
@@ -137,22 +124,11 @@ const AssetFormPopupMenu: FC<Props> = ({
         <Ellipsis />
       </PopupMenuButton>
       <Menu isOpen={isOpen}>
-        {popupMenuItems.map(({ isHidden, name, tooltip, onClick }) => {
+        {popupMenuItems.map(({ isHidden, name, onClick }) => {
           if (!isHidden) {
-            const menuItemContent = tooltip ? (
-              <Tooltip
-                text={tooltip.text}
-                numberOfLines={tooltip.numberOfLines}
-                isLeftAlignedToParent>
-                {name}
-              </Tooltip>
-            ) : (
-              name
-            );
-
             return (
               <MenuItem key={name} tabIndex={0} onClick={onClick}>
-                {menuItemContent}
+                {name}
               </MenuItem>
             );
           }

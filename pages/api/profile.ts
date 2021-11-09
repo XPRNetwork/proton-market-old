@@ -24,7 +24,7 @@ const handler = async (
         const avatarsByChainAccount = {};
         const promises = chainAccounts.map(async (account: string) => {
           if (!avatarsByChainAccount[account]) {
-            const avatar = await proton.getProfileImage(account);
+            const avatar = await proton.getProfileImage({ account });
             avatarsByChainAccount[account] = avatar;
           }
         });
